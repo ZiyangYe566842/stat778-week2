@@ -1,0 +1,128 @@
+---
+title: inclass-week2
+author: Ziyang Ye
+format:
+    html:
+        code-fold: true
+        embed-resources: true
+        self-contained: true
+        theme:
+            light: [cosmo, theme.scss]
+            dark: [cosmo, theme-dark.scss]
+        toc: true
+---
+
+### Create the list a
+
+```{r}
+a <- list(
+  i = 1:5,
+  ii = (1:5) / 5,
+  iii = letters[1:5]
+)
+a
+```
+
+### Function to raise element ii to a power
+```{r}
+raise_power <- function(lst, power) {
+  lst$ii <- lst$ii ^ power
+  lst
+}
+```
+### Apply function to a and create b
+
+```{r}
+b <- raise_power(a, power = 2)
+b
+```
+### Inspect references using lobstr::ref()
+```{r}
+library(lobstr)
+ref(a)
+# Output shows addresses of a and its elements
+ref(b)
+# Shows modified ii has a new address, while i and iii share addresses with a
+```
+
+### Combine lists into c and extract elements i
+```{r}
+c <- list(a, a, a)
+d <- lapply(c, `[[`, "i")
+print(d)
+ref(d)
+# All elements in d reference the same memory as a$i
+```
+
+### Using sapply() instead of lappl()
+```{r}
+e <- sapply(c, `[[`, "i")
+print(e)
+ref(e)
+
+# Output shows a new matrix/vector, distinct from a$i
+```
+
+### d (from lapply()) contains references to the same a$i.e (from sapply()) is a new matrix with copied data, showing no shared references.sapply() simplifies the list of vectors into a matrix/array if possible, thereby creating a new object in memory.
+
+### Create atomic vector of length 1,000,000. Coerce this vector into a matrix of dimensions 2000 by 500 using (a) the matrix() function and (b) the dim attribute. Which one would you prefer and why?
+```{r}
+# Create an atomic vector of length 1,000,000
+vec <- 1:1000000
+
+# Method (a): Using matrix()
+matrix_a <- matrix(vec, nrow = 2000, ncol = 500)
+
+# Method (b): Using dim attribute
+matrix_b <- vec
+dim(matrix_b) <- c(2000, 500)
+identical(matrix_a, matrix_b)
+
+```
+Preferred Method:
+The matrix() function is generally preferred for most use cases because:
+
+It is more explicit and readable, making the code easier to understand and maintain.
+
+
+### Select the 50th element of the 11th column
+```{r}
+element_matrix_index <- matrix_a[50, 11]
+
+```
+```{r}
+flat_index <- (11 - 1) * 2000 + 50
+element_flat_index <- matrix_a[flat_index]
+```
+```{r}
+identical(element_matrix_index, element_flat_index)
+# Output: TRUE
+```
+
+### Select the 36,321-th element
+```{r}
+i <- (36321 - 1) %% 2000 + 1
+j <- (36321 - 1) %/% 2000 + 1
+element_matrix_index <- matrix_a[i, j]
+```
+
+
+```{r}
+element_flat_index <- matrix_a[36321]
+```
+
+```{r}
+identical(element_flat_index, element_matrix_index)
+# Output: TRUE
+```
+
+### Create a new R script that accepts the following arguments:
+
+number of replications (integer > 0),
+output directory
+and which simply prints the values of these arguments to the console.
+
+Run this R script from within your project directory.
+
+
+
